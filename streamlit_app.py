@@ -19,26 +19,22 @@ prompt = ChatPromptTemplate.from_messages(
 
 chain = prompt | chat
 
-chat_history = ChatMessageHistory()
-
 # Streamlit app interface
 st.title("Simple Chatbot with LangChain")
 
 if 'messages' not in st.session_state:
     st.session_state['messages'] = []
+if 'chat_history' not in st.session_state:
+    st.session_state['chat_history'] = ChatMessageHistory()
 
 user_input = st.text_input("You:", key="input")
 
 if user_input:
-    chat_history.add_user_message(user_input)
+    st.session_state['chat_history'].add_user_message(user_input)
     st.session_state['messages'].append({"role": "user", "content": user_input})
-    response = chain.invoke(
-    {
-        "messages": chat_history.messages,
-    }
-)
-    chat_history.add_ai_message(response)
-    st.session_state['messages'].append({"role": "assistant", "content": response})
+    response = chain.invoke({"messages": st.session_state['chat_history'].messages,})
+    st.session_state['chat_history'].add_ai_message(response.content)
+    st.session_state['messages'].append({"role": "assistant", "content": response.content})
 
 for message in st.session_state['messages']:
     if message['role'] == 'user':
