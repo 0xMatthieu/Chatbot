@@ -8,12 +8,12 @@ Install packages : ```python3 -m pip install -r requirements.txt```
 
 ## llama.cpp :
 
-Information : https://python.langchain.com/v0.2/docs/integrations/llms/llamacpp/
+Documentation : https://python.langchain.com/v0.2/docs/integrations/llms/llamacpp/
 
 ### To install
 build depends on HW: 
 
-for MAC 2019 with Intel GPU: ```CMAKE_ARGS="-DGGML_METAL=on" FORCE_CMAKE=1 python3 -m pip install --upgrade --force-reinstall llama-cpp-python --no-cache-dir``
+for MAC 2019 with Intel GPU: ```CMAKE_ARGS="-DGGML_METAL=on" FORCE_CMAKE=1 python3 -m pip install --upgrade --force-reinstall llama-cpp-python --no-cache-dir```
 link : https://github.com/abetlen/llama-cpp-python#installation-with-openblas--cublas--clblast
 
 ## Model
