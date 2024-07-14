@@ -4,22 +4,26 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables.history import RunnableWithMessageHistory
+from langchain_core.callbacks import CallbackManager, StreamingStdOutCallbackHandler
 
 # Initialize the conversation chain with OpenAI and a memory buffer
 
-#model https://huggingface.co/Orenguteng/Llama-3-8B-Lexi-Uncensored-GGUF
-
 if 'chat' not in st.session_state:
-    n_gpu_layers = 0  # Metal set to 1 is enough.
+    n_gpu_layers = 0  # 0 means CPU only
     n_batch = 128  # Should be between 1 and n_ctx, consider the amount of RAM of your Apple Silicon Chip.
+
+    # Callbacks support token-wise streaming
+    callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
 
     st.session_state['chat'] = LlamaCpp(
         model_path=st.secrets['path_to_model'],
+        streaming=True,
         n_gpu_layers=n_gpu_layers,
         n_batch=n_batch,
         n_ctx=512,
         f16_kv=True,  # MUST set to True, otherwise you will run into problem after a couple of calls
-        verbose=True,
+        callback_manager=callback_manager,
+        verbose=True,  # Verbose is required to pass to the callback manager
     )
 if 'messages' not in st.session_state:
     st.session_state['messages'] = []
@@ -61,8 +65,7 @@ if user_input:
     #st.session_state['chat_history'].add_user_message(user_input)
     st.session_state['messages'].append({"role": "user", "content": user_input})
     #response = chain.invoke({"messages": st.session_state['chat_history'].messages,})
-    #response = st.session_state['chain_with_message_history'].invoke({"input": user_input}, {"configurable": {"session_id": "unused"}},)
-    response = st.session_state['chain'].invoke({"input": user_input})
+    response = st.session_state['chain_with_message_history'].invoke({"input": user_input}, {"configurable": {"session_id": "unused"}},)
 
     #st.session_state['chat_history'].add_ai_message(response.content)
     st.session_state['messages'].append({"role": "assistant", "content": response})
